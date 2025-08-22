@@ -39,12 +39,12 @@ jobs:
     - name: Select Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        # Use an available Xcode version
         xcode-version: '15.4'
 
     - name: Build macOS application without signing
       run: |
-        xcodebuild -project WireGuard.xcodeproj -scheme "WireGuard (macOS)" -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        # Corrected the scheme name to "WireGuard"
+        xcodebuild -project WireGuard.xcodeproj -scheme "WireGuard" -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
   build-ios:
     name: Build for iOS
@@ -78,9 +78,9 @@ jobs:
     - name: Select Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        # Use an available Xcode version
         xcode-version: '15.4'
 
     - name: Build iOS application without signing
       run: |
-        xcodebuild -project WireGuard.xcodeproj -scheme "WireGuard (iOS)" -sdk iphoneos -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        # Corrected the scheme name to "WireGuard"
+        xcodebuild -project WireGuard.xcodeproj -scheme "WireGuard" -sdk iphoneos -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
