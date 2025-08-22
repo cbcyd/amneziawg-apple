@@ -11,18 +11,13 @@ jobs:
     name: Build and Sign for macOS
     runs-on: macos-latest
 
-    # This is the fix: Set the default working directory for all run steps in this job
-    defaults:
-      run:
-        working-directory: ./amneziawg-apple
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      # The checkout action creates a directory named after the repo, so we need to cd into it.
-      # The 'path' property here explicitly names that directory.
-      with:
-        path: amneziawg-apple
+      # Let the action check out to the default directory, which is the repo name
+
+    - name: Verify Directory Structure
+      run: ls -l # This is for debugging to see the folder structure
 
     - name: Set up Go
       uses: actions/setup-go@v5
@@ -40,10 +35,10 @@ jobs:
     - name: Install SwiftLint
       run: |
         brew install swiftlint
-      # This step does not need the working directory as it's a global install
 
     - name: Import Signing Certificate
       run: |
+        # We run this from the root, so no cd needed here
         echo "${{ secrets.P12_BASE64 }}" | base64 --decode > certificate.p12
         security create-keychain -p "${{ secrets.P12_PASSWORD }}" build.keychain
         security default-keychain -s build.keychain
@@ -58,6 +53,8 @@ jobs:
         FASTLANE_PASSWORD: ${{ secrets.APPLE_ID_APP_SPECIFIC_PASSWORD }}
         FASTLANE_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
       run: |
+        # Explicitly change into the project directory first
+        cd amneziawg-apple
         bundle exec fastlane setup_signing
 
     - name: Select Xcode
@@ -67,6 +64,8 @@ jobs:
 
     - name: Build and Sign macOS application
       run: |
+        # Explicitly change into the project directory first
+        cd amneziawg-apple
         # IMPORTANT: Use the same unique identifier as in your Fastfile
         xcodebuild -project WireGuard.xcodeproj \
                    -target "WireGuardmacOS" \
@@ -83,5 +82,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: AmneziaWG-macOS-Signed
-        # The path to the artifact is now relative to the working-directory
         path: amneziawg-apple/build/Release/WireGuardmacOS.app
