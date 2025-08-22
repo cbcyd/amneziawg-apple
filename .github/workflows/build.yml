@@ -49,7 +49,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: AmneziaWG-macOS
-        path: build/Release/WireGuardmacOS.app
+        path: /Users/runner/work/amneziawg-apple/amneziawg-apple/build/Release/AmneziaWG.app
 
   build-ios:
     name: Build for iOS
