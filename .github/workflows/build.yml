@@ -1,0 +1,74 @@
+name: Build amneziawg-apple (No Signing)
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-macos:
+    name: Build for macOS
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Cache Homebrew dependencies
+      uses: actions/cache@v3
+      with:
+        path: /usr/local/Homebrew
+        key: ${{ runner.os }}-homebrew-${{ hashFiles('**/Brewfile') }}
+        restore-keys: |
+          ${{ runner.os }}-homebrew-
+
+    - name: Install dependencies
+      run: |
+        brew install swiftlint go@1.19
+
+    - name: Create Developer.xcconfig from template
+      run: |
+        cp Sources/WireGuardApp/Config/Developer.xcconfig.template Sources/WireGuardApp/Config/Developer.xcconfig
+
+    - name: Select Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '14.2'
+
+    - name: Build macOS application without signing
+      run: |
+        xcodebuild -project WireGuard.xcodeproj -scheme "WireGuard (macOS)" -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+
+  build-ios:
+    name: Build for iOS
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Cache Homebrew dependencies
+      uses: actions/cache@v3
+      with:
+        path: /usr/local/Homebrew
+        key: ${{ runner.os }}-homebrew-${{ hashFiles('**/Brewfile') }}
+        restore-keys: |
+          ${{ runner.os }}-homebrew-
+
+    - name: Install dependencies
+      run: |
+        brew install swiftlint go@1.19
+
+    - name: Create Developer.xcconfig from template
+      run: |
+        cp Sources/WireGuardApp/Config/Developer.xcconfig.template Sources/WireGuardApp/Config/Developer.xcconfig
+
+    - name: Select Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '14.2'
+
+    - name: Build iOS application without signing
+      run: |
+        xcodebuild -project WireGuard.xcodeproj -scheme "WireGuard (iOS)" -sdk iphoneos -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
