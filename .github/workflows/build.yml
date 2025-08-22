@@ -12,12 +12,11 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout repository to a clean path
       uses: actions/checkout@v3
-      # Let the action check out to the default directory, which is the repo name
-
-    - name: Verify Directory Structure
-      run: ls -l # This is for debugging to see the folder structure
+      with:
+        # Check out the code to a predictable directory named 'source'
+        path: 'source'
 
     - name: Set up Go
       uses: actions/setup-go@v5
@@ -29,8 +28,8 @@ jobs:
       with:
         ruby-version: '3.1'
         bundler-cache: true
-        # Tell the ruby action where to find the Gemfile
-        working-directory: ./amneziawg-apple
+        # Tell the ruby action to find the Gemfile inside our 'source' directory
+        working-directory: 'source'
 
     - name: Install SwiftLint
       run: |
@@ -38,7 +37,6 @@ jobs:
 
     - name: Import Signing Certificate
       run: |
-        # We run this from the root, so no cd needed here
         echo "${{ secrets.P12_BASE64 }}" | base64 --decode > certificate.p12
         security create-keychain -p "${{ secrets.P12_PASSWORD }}" build.keychain
         security default-keychain -s build.keychain
@@ -53,8 +51,8 @@ jobs:
         FASTLANE_PASSWORD: ${{ secrets.APPLE_ID_APP_SPECIFIC_PASSWORD }}
         FASTLANE_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
       run: |
-        # Explicitly change into the project directory first
-        cd amneziawg-apple
+        # Explicitly change into the 'source' directory first
+        cd source
         bundle exec fastlane setup_signing
 
     - name: Select Xcode
@@ -64,8 +62,8 @@ jobs:
 
     - name: Build and Sign macOS application
       run: |
-        # Explicitly change into the project directory first
-        cd amneziawg-apple
+        # Explicitly change into the 'source' directory first
+        cd source
         # IMPORTANT: Use the same unique identifier as in your Fastfile
         xcodebuild -project WireGuard.xcodeproj \
                    -target "WireGuardmacOS" \
@@ -82,4 +80,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: AmneziaWG-macOS-Signed
-        path: amneziawg-apple/build/Release/WireGuardmacOS.app
+        # The path to the artifact is now inside the 'source' directory
+        path: source/build/Release/WireGuardmacOS.app
