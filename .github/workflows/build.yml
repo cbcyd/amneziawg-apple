@@ -15,6 +15,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.19'
+
     - name: Cache Homebrew dependencies
       uses: actions/cache@v3
       with:
@@ -23,9 +28,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-homebrew-
 
-    - name: Install dependencies
+    - name: Install SwiftLint
       run: |
-        brew install swiftlint go@1.19
+        brew install swiftlint
 
     - name: Create Developer.xcconfig from template
       run: |
@@ -48,6 +53,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.19'
+
     - name: Cache Homebrew dependencies
       uses: actions/cache@v3
       with:
@@ -56,9 +66,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-homebrew-
 
-    - name: Install dependencies
+    - name: Install SwiftLint
       run: |
-        brew install swiftlint go@1.19
+        brew install swiftlint
 
     - name: Create Developer.xcconfig from template
       run: |
