@@ -1,4 +1,4 @@
-name: Build amneziawg-apple (No Signing)
+name: Build and Upload amneziawg-apple (No Signing)
 
 on:
   push:
@@ -43,8 +43,13 @@ jobs:
 
     - name: Build macOS application without signing
       run: |
-        # Add -lresolv linker flag to resolve DNS symbols
         xcodebuild -project WireGuard.xcodeproj -target "WireGuardmacOS" -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO OTHER_LDFLAGS="-lresolv"
+
+    - name: Upload macOS Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AmneziaWG-macOS
+        path: build/Release/WireGuardmacOS.app
 
   build-ios:
     name: Build for iOS
@@ -82,5 +87,10 @@ jobs:
 
     - name: Build iOS application without signing
       run: |
-        # Add -lresolv linker flag to resolve DNS symbols
         xcodebuild -project WireGuard.xcodeproj -target "WireGuardiOS" -sdk iphoneos -configuration Release build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO OTHER_LDFLAGS="-lresolv"
+
+    - name: Upload iOS Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AmneziaWG-iOS
+        path: build/Release-iphoneos/WireGuardiOS.app
